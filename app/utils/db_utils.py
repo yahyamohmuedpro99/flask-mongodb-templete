@@ -1,18 +1,22 @@
 # functions and connection for the database
 from pymongo import MongoClient
 import os
-from dotenv import load_dotenv , find_dotenv
+from app import app
+from flask_bcrypt import Bcrypt
+from config import MONGODB_URI,DB_NAME
+bycrypt = Bcrypt(app)
 
-# connection and database 
-load_dotenv(find_dotenv())
-password=os.getenv("MDB_PSWD")
-MONGODB_URI = f"mongodb+srv://yahya:{password}@learncluster.mk6ma6e.mongodb.net/?retryWrites=true&w=majority&appName=LearnCluster"
-DB_NAME = "Learn"
-
-def get_db_instance():
+def get_client():
     return MongoClient(MONGODB_URI)
 
-
-def get_db_by_name(name):
-    client_instance = get_db_instance()
+def get_db(name=DB_NAME):
+    client_instance = get_client()
     return client_instance[name]
+
+def get_collection(name:str,db=DB_NAME):
+    db=get_db(db)
+    return db[name]
+
+def hash_password(password):
+    return bycrypt.generate_password_hash(password)
+    
